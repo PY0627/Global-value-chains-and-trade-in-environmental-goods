@@ -1,4 +1,4 @@
-This is the data analysis/empirical analysis used for one of my research projects, analyzing the role of GVC position on cross-border trade in environmental products. Also, the mediating effects of sectoral digital intensity and GVC participation across 75 countries are analyzed. 
+This is the data analysis/empirical analysis used for one of my research projects, analyzing the role of GVC position on cross-border trade in environmental products. Also, the mediating effects of sectoral digital intensity, different kinds of digital provisions in existing trade agreements and GVC participation across 75 countries are analyzed. 
 
 The analysis harmonizes data from multiple sources: OECD multi-regional input-output tables, CEPII,and Asian Development Bank multi-regional input-output tables. Variables of digitalization, GVC indicators, and RTAs are constructed accordingly. The total size of dataset is around 110 GB.
 
