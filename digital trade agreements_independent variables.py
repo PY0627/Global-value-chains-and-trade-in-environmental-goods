@@ -13,19 +13,20 @@ import os
 
 import pandas as pd
 
-# 指定文件路径
-file_path = r'E:\闲鱼\第二部分\Gravity_csv_V202211\Gravity_V202211.csv'
+# specify file path
+file_path = r'E:\Gravity_csv_V202211\Gravity_V202211.csv'
 
-DIGIT_OECD=pd.read_excel(r"E:\闲鱼\DIGIT_OECD.xlsx")
-# 分列 industry 列，并删除 Subcode 列
+DIGIT_OECD=pd.read_excel(r"E:\DIGIT_OECD.xlsx")
+
+# split industry ，and delete Subcode column
 split_columns = DIGIT_OECD['industry'].str.split('_', expand=True)
 split_columns.columns = ['Country', 'Code', 'Subcode']
 DIGIT_OECD = pd.concat([DIGIT_OECD.drop(columns=['industry']), split_columns], axis=1).drop(columns=['Subcode'])
 
-# 读取CSV文件并保留特定列
+# Read a CSV file and retain specific columns
 columns_to_keep = ['year', 'country_id_o', 'country_id_d', 'distcap', 'contig', 'comlang_ethno', 'comrelig', 'pop_o', 'pop_d', 'gdp_o', 'gdp_d', 'fta_wto_raw']
 df = pd.read_csv(file_path, usecols=columns_to_keep)
-# 筛选 year 列，使其在 1995-2020 之间
+# Filter the 'year' column to include values between 1995 and 2020
 df_filtered = df[(df['year'] >= 1995) & (df['year'] <= 2020)]
 del df
 df_filtered=df_filtered[df_filtered['country_id_o'].isin(DIGIT_OECD['Country']) | df_filtered['country_id_d'].isin(DIGIT_OECD['Country'])]
@@ -34,22 +35,22 @@ df_filtered=df_filtered[df_filtered['country_id_o'].isin(DIGIT_OECD['Country']) 
 # In[5]:
 
 
-# 添加后缀 "_o" 到 DIGIT_OECD 除 year, Country, Code 列以外的列名
+# add the suffix '_o' to the column names of DIGIT_OECD, except for the columns year, Country, and Code
 digit_oecd_o = DIGIT_OECD.rename(columns=lambda x: x + '_o' if x not in ['year', 'Country', 'Code'] else x)
 
-# 通过 df 的 country_id_o 和 year 与 DIGIT_OECD 的 Country 和 year 进行匹配
+# Match df's country_id_o and year with DIGIT_OECD's Country and year
 df_filtered = pd.merge(df_filtered, digit_oecd_o, left_on=['country_id_o', 'year'], right_on=['Country', 'year'], how='left')
 
-# 删除不需要的列
+# Delete unnecessary columns
 df_filtered.drop(columns=['Country'], inplace=True)
 
-# 添加后缀 "_d" 到 DIGIT_OECD 除 year, Country, Code 列以外的列名
+# Add the suffix '_d' to the column names of DIGIT_OECD, except for the columns year, Country, and Code
 digit_oecd_d = DIGIT_OECD.rename(columns=lambda x: x + '_d' if x not in ['year', 'Country', 'Code'] else x)
 
-# 通过 df 的 country_id_d 和 year 与 DIGIT_OECD 的 Country 和 year 进行匹配
+# Match df's country_id_d and year with DIGIT_OECD's Country and year
 df_filtered = pd.merge(df_filtered, digit_oecd_d, left_on=['country_id_d', 'year'], right_on=['Country', 'year'], how='left')
 
-# 删除不需要的列
+# delete unnecessary columns
 df_filtered.drop(columns=['Country'], inplace=True)
 
 
@@ -59,59 +60,59 @@ df_filtered.drop(columns=['Country'], inplace=True)
 import pandas as pd
 import os
 
-# 指定文件路径
-file_path = r'E:\闲鱼\第二部分\Gravity_csv_V202211\Gravity_V202211.csv'
+# Specify file path
+file_path = r'E:\Gravity_csv_V202211\Gravity_V202211.csv'
 output_dir = r'F:\工作\digit'
 
-# 创建输出目录（如果不存在）
+# 
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-# 读取 DIGIT_OECD 表格
-DIGIT_OECD = pd.read_excel(r"E:\闲鱼\DIGIT_OECD.xlsx")
-# 分列 industry 列，并删除 Subcode 列
+
+DIGIT_OECD = pd.read_excel(r"E:\DIGIT_OECD.xlsx")
+# split industry columns
 split_columns = DIGIT_OECD['industry'].str.split('_', expand=True)
 split_columns.columns = ['Country', 'Code', 'Subcode']
 DIGIT_OECD = pd.concat([DIGIT_OECD.drop(columns=['industry']), split_columns], axis=1).drop(columns=['Subcode'])
 
-# 筛选 year 列，使其在 1995-2020 之间，并分块读取和处理 CSV 文件
+# Filter the year column to include values between 1995 and 2020, and read and process the CSV file in chunks.
 columns_to_keep = ['year', 'country_id_o', 'country_id_d', 'distcap', 'contig', 'comlang_ethno', 'comrelig', 'pop_o', 'pop_d', 'gdp_o', 'gdp_d', 'fta_wto_raw']
 
 chunk_size = 2000
 
 for chunk in pd.read_csv(file_path, usecols=columns_to_keep, chunksize=chunk_size):
-    # 筛选 year 列，使其在 1995-2020 之间
+    # Filter the year column to include values between 1995 and 2020
     chunk_filtered = chunk[(chunk['year'] >= 1995) & (chunk['year'] <= 2020)]
     
-    # 筛选 country_id_o 和 country_id_d 在 DIGIT_OECD 的 Country 列中的行
+    # Filter rows where country_id_o and country_id_d are in the Country column of DIGIT_OECD
     chunk_filtered = chunk_filtered[chunk_filtered['country_id_o'].isin(DIGIT_OECD['Country']) | chunk_filtered['country_id_d'].isin(DIGIT_OECD['Country'])]
     
-    # 添加后缀 "_o" 到 DIGIT_OECD 除 year, Country, Code 列以外的列名
+    # Add the suffix '_o' to the column names of DIGIT_OECD, except for the columns year, Country, and Code
     digit_oecd_o = DIGIT_OECD.rename(columns=lambda x: x + '_o' if x not in ['year', 'Country', 'Code'] else x)
     
-    # 通过 df 的 country_id_o 和 year 与 DIGIT_OECD 的 Country 和 year 进行匹配
+    # Match df's country_id_o and year with DIGIT_OECD's Country and year
     chunk_filtered = pd.merge(chunk_filtered, digit_oecd_o, left_on=['country_id_o', 'year'], right_on=['Country', 'year'], how='left')
     
-    # 删除不需要的列
+    # delete unnecessary columns
     chunk_filtered.drop(columns=['Country'], inplace=True)
     
-    # 添加后缀 "_d" 到 DIGIT_OECD 除 year, Country, Code 列以外的列名
+    # Add the suffix '_d' to the column names of DIGIT_OECD, except for the columns year, Country, and Code
     digit_oecd_d = DIGIT_OECD.rename(columns=lambda x: x + '_d' if x not in ['year', 'Country', 'Code'] else x)
     
-    # 通过 df 的 country_id_d 和 year 与 DIGIT_OECD 的 Country 和 year 进行匹配
+    # Match df's country_id_d and year with DIGIT_OECD's Country and year
     chunk_filtered = pd.merge(chunk_filtered, digit_oecd_d, left_on=['country_id_d', 'year'], right_on=['Country', 'year'], how='left')
     
-    # 删除不需要的列
+    # Remove unnecessary columns
     chunk_filtered.drop(columns=['Country'], inplace=True)
     
-    # 获取当前块中最后一行的索引数
+    # Get the index of the last row in the current chunk
     last_index = chunk_filtered.index[-1]
     
-    # 保存处理后的块到文件
+    # Save the processed chunk to a file
     output_file = os.path.join(output_dir, f'DIGIT_{last_index}.csv')
     chunk_filtered.to_csv(output_file, index=False)
 
-print("处理完成，结果已保存到", output_dir)
+print("results have been saved to", output_dir)
 
 
 # In[20]:
